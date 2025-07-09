@@ -1,80 +1,102 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        android:padding="24dp">
 
         <!-- Email Field -->
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/logotxt"
+            app:srcCompat="@drawable/logo" />
+
         <EditText
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email or Phone"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#0F0F0F"
+            android:hint="@string/emailHint"
             android:inputType="textEmailAddress"
-            android:layout_marginBottom="16dp" />
+            android:padding="20dp" />
 
         <!-- Password + Toggle -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="25dp"
             android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/inputPassword"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:layout_weight="1"
+                android:hint="Create Password"
                 android:inputType="textPassword"
-                android:padding="10dp" />
+                android:padding="20dp" />
 
             <ImageView
                 android:id="@+id/togglePassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="Toggle confirm password visibility"
                 android:padding="10dp"
-                android:src="@drawable/ic_eye_off"
-                android:contentDescription="Toggle password visibility" />
+                android:src="@drawable/ic_eye_off" />
         </LinearLayout>
-
         <!-- Confirm Password + Toggle -->
+
+        <!-- Register Button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="25dp"
             android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/inputConfirmPassword"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="Confirm Password"
                 android:inputType="textPassword"
-                android:padding="10dp" />
+                android:padding="20dp" />
 
             <ImageView
                 android:id="@+id/toggleConfirmPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="Toggle confirm password visibility"
                 android:padding="10dp"
-                android:src="@drawable/ic_eye_off"
-                android:contentDescription="Toggle confirm password visibility" />
+                android:src="@drawable/ic_eye_off" />
         </LinearLayout>
 
-        <!-- Register Button -->
         <Button
             android:id="@+id/btnCreateAccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:text="Create Account" />
 
         <!-- Already Have Account Button -->
@@ -82,7 +104,10 @@
             android:id="@+id/btnAlreadyHaveAccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Already have an account? Login"
-            android:layout_marginTop="12dp" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="20dp"
+            android:text="Already have an account? Login" />
+
     </LinearLayout>
 </ScrollView>

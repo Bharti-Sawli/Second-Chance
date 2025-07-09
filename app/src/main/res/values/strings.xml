@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Secondchance</string>
+    <string name="logotxt">logo</string>
+    <string name="emailHint">Email or Phone</string>
 </resources>
