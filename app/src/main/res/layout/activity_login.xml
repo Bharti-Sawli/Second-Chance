@@ -1,60 +1,80 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="match_parent"
+            android:layout_height="106dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            app:srcCompat="@drawable/logo" />
 
         <EditText
             android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:hint="Email or Phone"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:padding="20dp" />
 
         <!-- Password + Toggle in horizontal layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
             android:gravity="center_vertical"
-            android:layout_marginTop="16dp">
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/inputPassword"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:padding="10dp" />
+                android:padding="20dp" />
 
             <ImageView
                 android:id="@+id/togglePassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="Toggle password"
                 android:padding="10dp"
-                android:src="@drawable/ic_eye_off"
-                android:contentDescription="Toggle password" />
+                android:src="@drawable/ic_eye_off" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
-            android:layout_marginTop="24dp" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="20dp"
+            android:text="Login" />
 
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New User? Register"
-            android:layout_marginTop="12dp" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="20dp"
+            android:text="New User? Register" />
 
     </LinearLayout>
 </ScrollView>
