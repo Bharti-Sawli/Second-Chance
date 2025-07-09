@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Secondchance</string>
     <string name="logotxt">logo</string>
-    <string name="emailHint">Email or Phone</string>
+    <string name="emailHint">Email</string>
+    <string name="name">Enter your name</string>
 </resources>

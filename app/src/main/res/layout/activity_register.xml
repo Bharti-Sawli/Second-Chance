@@ -22,13 +22,25 @@
             app:srcCompat="@drawable/logo" />
 
         <EditText
-            android:id="@+id/inputEmail"
+            android:id="@+id/inputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
+            android:backgroundTint="#0F0F0F"
+            android:hint="@string/name"
+            android:inputType="textPersonName"
+            android:padding="20dp" />
+
+        <EditText
+            android:id="@+id/inputEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
             android:backgroundTint="#0F0F0F"
             android:hint="@string/emailHint"
             android:inputType="textEmailAddress"
@@ -40,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -90,6 +102,14 @@
                 android:padding="10dp"
                 android:src="@drawable/ic_eye_off" />
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btnCreateAccount"
