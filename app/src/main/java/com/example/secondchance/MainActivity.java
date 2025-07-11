@@ -112,10 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 // Navigate to ListingsActivity
                 startActivity(new Intent(MainActivity.this, ListingsActivity.class));
                 return true;
-            } else if (itemId == R.id.nav_chat) {
-                // Navigate to ChatActivity
-                startActivity(new Intent(MainActivity.this, ChatActivity.class));
-                return true;
             } else if (itemId == R.id.nav_profile) {
                 // Navigate to ProfileActivity
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
@@ -192,17 +188,17 @@ public class MainActivity extends AppCompatActivity {
         private String title;
         private String category;
         private String price;
-        private String imageUrl;
+        private String imageurl; // Changed from imageUrl to imageurl to match Firebase key
 
         // Required empty constructor for Firebase
         public Item() {}
 
-        public Item(String id, String title, String category, String price, String imageUrl) {
+        public Item(String id, String title, String category, String price, String imageurl) {
             this.id = id;
             this.title = title;
             this.category = category;
             this.price = price;
-            this.imageUrl = imageUrl;
+            this.imageurl = imageurl;
         }
 
         // Getters and setters
@@ -214,8 +210,8 @@ public class MainActivity extends AppCompatActivity {
         public void setCategory(String category) { this.category = category; }
         public String getPrice() { return price; }
         public void setPrice(String price) { this.price = price; }
-        public String getImageUrl() { return imageUrl; }
-        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+        public String getImageUrl() { return imageurl; } // Getter remains getImageUrl() for compatibility
+        public void setImageUrl(String imageurl) { this.imageurl = imageurl; } // Setter uses imageurl parameter
     }
 
     // RecyclerView adapter
