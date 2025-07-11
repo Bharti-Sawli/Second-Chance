@@ -1,4 +1,4 @@
 package com.example.secondchance;
 
-public class HomeActivity {
+public class ProfileActivity {
 }
