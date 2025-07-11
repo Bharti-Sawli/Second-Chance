@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FDFDFD">
+    android:background="#FFFFFF">
 
     <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="61dp"
         android:background="#000000"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -78,17 +78,20 @@
                 android:id="@+id/profileHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/search_box_border"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
+
                 <ImageView
                     android:id="@+id/profileImage"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_marginEnd="16dp"
+                    android:background="@drawable/search_box_border"
                     android:contentDescription="Profile Picture"
                     android:scaleType="centerCrop"
                     android:src="@drawable/profile_placeholder" />
@@ -297,7 +300,7 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="#0F0F0F"
         app:itemIconTint="#FFFFFF"
