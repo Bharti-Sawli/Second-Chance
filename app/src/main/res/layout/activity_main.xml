@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#FDFDFD">
 
+
     <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
@@ -241,4 +242,5 @@
         app:itemTextColor="#FFFFFF"
         app:menu="@menu/bottom_nav_menu" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
