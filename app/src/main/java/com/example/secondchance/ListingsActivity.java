@@ -29,21 +29,29 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class ListingsActivity extends AppCompatActivity {
 
+    private static final String TAG = "ListingsActivity";
     private FirebaseAuth mAuth;
     private DatabaseReference db;
     private TextView txtWelcome;
     private EditText inputSearch;
-    private ImageView searchIcon;
+    private ImageView searchIcon, profileIcon;
     private Button categoryBooks, categoryElectronics, categoryClothing, categoryOthers;
-    private RecyclerView recyclerViewRecommended, recyclerViewRecent;
+    private RecyclerView recyclerViewRecommended;
     private BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        try {
+            setContentView(R.layout.activity_listing);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set content view: ", e);
+            Toast.makeText(this, "Error loading layout", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         // Check network availability
         if (!isNetworkAvailable()) {
@@ -52,20 +60,34 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Initialize Firebase
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseDatabase.getInstance().getReference();
+        try {
+            mAuth = FirebaseAuth.getInstance();
+            db = FirebaseDatabase.getInstance().getReference();
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize Firebase: ", e);
+            Toast.makeText(this, "Error initializing Firebase", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         // Initialize UI elements
-        txtWelcome = findViewById(R.id.txtWelcome);
-        inputSearch = findViewById(R.id.inputSearch);
-        searchIcon = findViewById(R.id.searchIcon);
-        categoryBooks = findViewById(R.id.categoryBooks);
-        categoryElectronics = findViewById(R.id.categoryElectronics);
-        categoryClothing = findViewById(R.id.categoryClothing);
-        categoryOthers = findViewById(R.id.categoryOthers);
-        recyclerViewRecommended = findViewById(R.id.recyclerViewRecommended);
-        recyclerViewRecent = findViewById(R.id.recyclerViewRecent);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
+        try {
+            txtWelcome = findViewById(R.id.txtWelcome);
+            inputSearch = findViewById(R.id.inputSearch);
+            searchIcon = findViewById(R.id.searchIcon);
+            profileIcon = findViewById(R.id.profileIcon);
+            categoryBooks = findViewById(R.id.categoryBooks);
+            categoryElectronics = findViewById(R.id.categoryElectronics);
+            categoryClothing = findViewById(R.id.categoryClothing);
+            categoryOthers = findViewById(R.id.categoryOthers);
+            recyclerViewRecommended = findViewById(R.id.recyclerViewRecommended);
+            bottomNavigation = findViewById(R.id.bottomNavigation);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to initialize UI elements: ", e);
+            Toast.makeText(this, "Error initializing UI", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         // Set welcome message
         FirebaseUser user = mAuth.getCurrentUser();
@@ -76,47 +98,72 @@ public class MainActivity extends AppCompatActivity {
                     txtWelcome.setText("Welcome, " + name + "!");
                 } else {
                     txtWelcome.setText("Welcome, User!");
-                    Log.e("MainActivity", "Failed to fetch user name: " + task.getException());
+                    Log.w(TAG, "Failed to fetch user name: " + (task.getException() != null ? task.getException().getMessage() : "No name data"));
                 }
             });
+        } else {
+            Log.w(TAG, "No user logged in during welcome message setup");
+            txtWelcome.setText("Welcome, User!");
         }
 
         // Set up search functionality
         searchIcon.setOnClickListener(v -> {
             String query = inputSearch.getText().toString().trim();
             if (query.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Please enter a search query", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListingsActivity.this, "Please enter a search query", Toast.LENGTH_SHORT).show();
             } else {
                 searchListings(query);
             }
         });
 
         // Set up category buttons
-        categoryBooks.setOnClickListener(v -> filterListings("Books"));
-        categoryElectronics.setOnClickListener(v -> filterListings("Electronics"));
-        categoryClothing.setOnClickListener(v -> filterListings("Clothing"));
+        categoryBooks.setOnClickListener(v -> filterListings("JEE"));
+        categoryElectronics.setOnClickListener(v -> filterListings("NEET"));
+        categoryClothing.setOnClickListener(v -> filterListings("UPSC"));
         categoryOthers.setOnClickListener(v -> filterListings("Others"));
 
-        // Set up RecyclerViews
-        setupRecyclerViews();
+        // Set up profile icon click
+        profileIcon.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(ListingsActivity.this, ProfileActivity.class));
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to start ProfileActivity: ", e);
+                Toast.makeText(ListingsActivity.this, "Error opening profile", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Set up RecyclerView
+        setupRecyclerView();
 
         // Set up bottom navigation
-        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                // Already on home
-                return true;
-            } else if (itemId == R.id.nav_listings) {
-                // Navigate to ListingsActivity
-                startActivity(new Intent(MainActivity.this, ListingsActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                // Navigate to ProfileActivity
-                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-                return true;
-            }
-            return false;
-        });
+        try {
+            bottomNavigation.setSelectedItemId(R.id.nav_listings); // Highlight Listings tab
+            bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                try {
+                    if (itemId == R.id.nav_home) {
+                        startActivity(new Intent(ListingsActivity.this, MainActivity.class));
+                        finish();
+                        return true;
+                    } else if (itemId == R.id.nav_listings) {
+                        // Already on Listings
+                        return true;
+                    } else if (itemId == R.id.nav_profile) {
+                        startActivity(new Intent(ListingsActivity.this, ProfileActivity.class));
+                        finish();
+                        return true;
+                    }
+                    return false;
+                } catch (Exception e) {
+                    Log.e(TAG, "Navigation error: ", e);
+                    Toast.makeText(ListingsActivity.this, "Navigation error", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set up bottom navigation: ", e);
+            Toast.makeText(this, "Error setting up navigation", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -124,56 +171,53 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is logged in
         if (mAuth.getCurrentUser() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+            try {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to start LoginActivity: ", e);
+                Toast.makeText(this, "Error redirecting to login", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
-    private void setupRecyclerViews() {
-        // Set layout managers for horizontal scrolling
-        recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerViewRecent.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+    private void setupRecyclerView() {
+        // Set layout manager for vertical scrolling
+        recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // Initialize adapters with empty lists
+        // Initialize adapter with empty list
         List<Item> recommendedItems = new ArrayList<>();
-        List<Item> recentItems = new ArrayList<>();
-        ItemAdapter recommendedAdapter = new ItemAdapter(recommendedItems, MainActivity.this);
-        ItemAdapter recentAdapter = new ItemAdapter(recentItems, MainActivity.this);
+        ItemAdapter recommendedAdapter = new ItemAdapter(recommendedItems, ListingsActivity.this);
         recyclerViewRecommended.setAdapter(recommendedAdapter);
-        recyclerViewRecent.setAdapter(recentAdapter);
 
         // Fetch data from Firebase
         db.child("items").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 recommendedItems.clear();
-                recentItems.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null) {
-                        // Simple logic for recommended vs recent (customize as needed)
-                        if (recommendedItems.size() < 5) {
-                            recommendedItems.add(item);
-                        } else {
-                            recentItems.add(item);
-                        }
+                        recommendedItems.add(item);
                     }
                 }
                 recommendedAdapter.notifyDataSetChanged();
-                recentAdapter.notifyDataSetChanged();
+                if (recommendedItems.isEmpty()) {
+                    Toast.makeText(ListingsActivity.this, "No items available", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("MainActivity", "Failed to fetch items: ", databaseError.toException());
-                Toast.makeText(MainActivity.this, "Failed to load items", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to fetch items: ", databaseError.toException());
+                Toast.makeText(ListingsActivity.this, "Failed to load items", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void filterListings(String category) {
         List<Item> filteredItems = new ArrayList<>();
-        ItemAdapter filteredAdapter = new ItemAdapter(filteredItems, MainActivity.this);
+        ItemAdapter filteredAdapter = new ItemAdapter(filteredItems, ListingsActivity.this);
         recyclerViewRecommended.setAdapter(filteredAdapter);
 
         db.child("items").orderByChild("category").equalTo(category).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -188,21 +232,21 @@ public class MainActivity extends AppCompatActivity {
                 }
                 filteredAdapter.notifyDataSetChanged();
                 if (filteredItems.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "No items found in " + category, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ListingsActivity.this, "No items found in " + category, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("MainActivity", "Failed to filter items: ", databaseError.toException());
-                Toast.makeText(MainActivity.this, "Failed to filter items", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to filter items: ", databaseError.toException());
+                Toast.makeText(ListingsActivity.this, "Failed to filter items", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void searchListings(String query) {
         List<Item> searchResults = new ArrayList<>();
-        ItemAdapter searchAdapter = new ItemAdapter(searchResults, MainActivity.this);
+        ItemAdapter searchAdapter = new ItemAdapter(searchResults, ListingsActivity.this);
         recyclerViewRecommended.setAdapter(searchAdapter);
 
         db.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -211,28 +255,33 @@ public class MainActivity extends AppCompatActivity {
                 searchResults.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
-                    if (item != null && item.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                    if (item != null && item.getTitle() != null && item.getTitle().toLowerCase().contains(query.toLowerCase())) {
                         searchResults.add(item);
                     }
                 }
                 searchAdapter.notifyDataSetChanged();
                 if (searchResults.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "No items found for \"" + query + "\"", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ListingsActivity.this, "No items found for \"" + query + "\"", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("MainActivity", "Failed to search items: ", databaseError.toException());
-                Toast.makeText(MainActivity.this, "Failed to search items", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to search items: ", databaseError.toException());
+                Toast.makeText(ListingsActivity.this, "Failed to search items", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        } catch (Exception e) {
+            Log.e(TAG, "Network check failed: ", e);
+            return false;
+        }
     }
 
     // Item class for data model
@@ -251,7 +300,8 @@ public class MainActivity extends AppCompatActivity {
         // Required empty constructor for Firebase
         public Item() {}
 
-        public Item(String id, String userId, String title, String author, String category, String price, String condition, String description, String imageUrl1, String imageUrl2) {
+        public Item(String id, String userId, String title, String author, String category, String price,
+                    String condition, String description, String imageUrl1, String imageUrl2) {
             this.id = id;
             this.userId = userId;
             this.title = title;
@@ -299,15 +349,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public ItemViewHolder onCreateViewHolder(android.view.ViewGroup parent, int viewType) {
-            android.view.View view = getLayoutInflater().inflate(R.layout.item_layout, parent, false);
+            android.view.View view = getLayoutInflater().inflate(R.layout.item_listing_layout, parent, false);
             return new ItemViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(ItemViewHolder holder, int position) {
             Item item = items.get(position);
-            holder.title.setText(item.getTitle());
-            holder.price.setText(item.getPrice());
+            holder.title.setText(item.getTitle() != null ? item.getTitle() : "No Title");
+            holder.price.setText(item.getPrice() != null ? item.getPrice() : "No Price");
 
             // Load image using Glide (use imageUrl1, fallback to placeholder if null)
             if (item.getImageUrl1() != null && !item.getImageUrl1().isEmpty()) {
@@ -321,10 +371,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.itemView.setOnClickListener(v -> {
-                // Navigate to item details activity
-                Intent intent = new Intent(MainActivity.this, ItemDetailsActivity.class);
-                intent.putExtra("itemId", item.getId());
-                startActivity(intent);
+                try {
+                    Intent intent = new Intent(ListingsActivity.this, ItemDetailsActivity.class);
+                    intent.putExtra("itemId", item.getId());
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to start ItemDetailsActivity: ", e);
+                    Toast.makeText(ListingsActivity.this, "Error opening item details", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
