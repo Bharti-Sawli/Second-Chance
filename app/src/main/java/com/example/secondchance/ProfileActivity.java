@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,6 +31,9 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView profileName, profileEmail, nameValue, emailValue, phoneValue, addressValue;
     private ImageView editName, editPhone, editAddress;
     private BottomNavigationView bottomNavigation;
+    private TextView textView2; // Reference to "SecondChance" TextView
+    private ImageView logo, profileIcon; // References to logo and profile icon
+    private Button btnPutBookOnSale;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,10 @@ public class ProfileActivity extends AppCompatActivity {
         editPhone = findViewById(R.id.editPhone);
         editAddress = findViewById(R.id.editAddress);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        textView2 = findViewById(R.id.textView2); // "SecondChance" text
+        logo = findViewById(R.id.logo); // App logo
+        profileIcon = findViewById(R.id.profileIcon); // Profile icon
+        btnPutBookOnSale = findViewById(R.id.btnPutBookOnSale); // Put a Book on Sale button
 
         // Load user data
         loadUserData();
@@ -59,6 +67,28 @@ public class ProfileActivity extends AppCompatActivity {
         editName.setOnClickListener(v -> showEditDialog(nameValue, "name"));
         editPhone.setOnClickListener(v -> showEditDialog(phoneValue, "phone"));
         editAddress.setOnClickListener(v -> showEditDialog(addressValue, "address"));
+
+        // Set up header navigation
+        textView2.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+            finish();
+        });
+
+        logo.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, MainActivity.class));
+            finish();
+        });
+
+        profileIcon.setOnClickListener(v -> {
+            // Refresh or do nothing since already on ProfileActivity
+            recreate(); // Optional: Recreates the activity to refresh data
+        });
+
+        // Set up "Put a Book on Sale" navigation
+        btnPutBookOnSale.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, SaleBookActivity.class));
+            finish();
+        });
 
         // Set up bottom navigation
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
