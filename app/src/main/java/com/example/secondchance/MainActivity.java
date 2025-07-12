@@ -87,16 +87,14 @@ public class MainActivity extends AppCompatActivity {
             if (query.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Please enter a search query", Toast.LENGTH_SHORT).show();
             } else {
-                // TODO: Implement search functionality (e.g., query Firebase for items)
-                Toast.makeText(MainActivity.this, "Searching for: " + query, Toast.LENGTH_SHORT).show();
-                // Example: Start a new activity or update RecyclerViews with search results
+                searchListings(query);
             }
         });
 
         // Set up category buttons
-        categoryBooks.setOnClickListener(v -> filterListings("JEE"));
-        categoryElectronics.setOnClickListener(v -> filterListings("NEET"));
-        categoryClothing.setOnClickListener(v -> filterListings("UPSC"));
+        categoryBooks.setOnClickListener(v -> filterListings("Books"));
+        categoryElectronics.setOnClickListener(v -> filterListings("Electronics"));
+        categoryClothing.setOnClickListener(v -> filterListings("Clothing"));
         categoryOthers.setOnClickListener(v -> filterListings("Others"));
 
         // Set up RecyclerViews
@@ -136,11 +134,15 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerViewRecent.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Initialize adapters with sample data or Firebase data
+        // Initialize adapters with empty lists
         List<Item> recommendedItems = new ArrayList<>();
         List<Item> recentItems = new ArrayList<>();
+        ItemAdapter recommendedAdapter = new ItemAdapter(recommendedItems, MainActivity.this);
+        ItemAdapter recentAdapter = new ItemAdapter(recentItems, MainActivity.this);
+        recyclerViewRecommended.setAdapter(recommendedAdapter);
+        recyclerViewRecent.setAdapter(recentAdapter);
 
-        // Fetch data from Firebase (example structure: items/{itemId})
+        // Fetch data from Firebase
         db.child("items").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -157,9 +159,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
-                // Update adapters with context
-                recyclerViewRecommended.setAdapter(new ItemAdapter(recommendedItems, MainActivity.this));
-                recyclerViewRecent.setAdapter(new ItemAdapter(recentItems, MainActivity.this));
+                recommendedAdapter.notifyDataSetChanged();
+                recentAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -171,9 +172,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void filterListings(String category) {
-        // TODO: Implement filtering logic (e.g., query Firebase for items in the selected category)
-        Toast.makeText(MainActivity.this, "Filtering by: " + category, Toast.LENGTH_SHORT).show();
-        // Example: Update RecyclerViews with filtered data
+        List<Item> filteredItems = new ArrayList<>();
+        ItemAdapter filteredAdapter = new ItemAdapter(filteredItems, MainActivity.this);
+        recyclerViewRecommended.setAdapter(filteredAdapter);
+
+        db.child("items").orderByChild("category").equalTo(category).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                filteredItems.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Item item = snapshot.getValue(Item.class);
+                    if (item != null) {
+                        filteredItems.add(item);
+                    }
+                }
+                filteredAdapter.notifyDataSetChanged();
+                if (filteredItems.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "No items found in " + category, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("MainActivity", "Failed to filter items: ", databaseError.toException());
+                Toast.makeText(MainActivity.this, "Failed to filter items", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void searchListings(String query) {
+        List<Item> searchResults = new ArrayList<>();
+        ItemAdapter searchAdapter = new ItemAdapter(searchResults, MainActivity.this);
+        recyclerViewRecommended.setAdapter(searchAdapter);
+
+        db.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                searchResults.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Item item = snapshot.getValue(Item.class);
+                    if (item != null && item.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                        searchResults.add(item);
+                    }
+                }
+                searchAdapter.notifyDataSetChanged();
+                if (searchResults.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "No items found for \"" + query + "\"", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("MainActivity", "Failed to search items: ", databaseError.toException());
+                Toast.makeText(MainActivity.this, "Failed to search items", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean isNetworkAvailable() {
@@ -185,33 +238,53 @@ public class MainActivity extends AppCompatActivity {
     // Item class for data model
     public static class Item {
         private String id;
+        private String userId;
         private String title;
+        private String author;
         private String category;
         private String price;
-        private String imageurl; // Changed from imageUrl to imageurl to match Firebase key
+        private String condition;
+        private String description;
+        private String imageUrl1;
+        private String imageUrl2;
 
         // Required empty constructor for Firebase
         public Item() {}
 
-        public Item(String id, String title, String category, String price, String imageurl) {
+        public Item(String id, String userId, String title, String author, String category, String price, String condition, String description, String imageUrl1, String imageUrl2) {
             this.id = id;
+            this.userId = userId;
             this.title = title;
+            this.author = author;
             this.category = category;
             this.price = price;
-            this.imageurl = imageurl;
+            this.condition = condition;
+            this.description = description;
+            this.imageUrl1 = imageUrl1;
+            this.imageUrl2 = imageUrl2;
         }
 
         // Getters and setters
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
+        public String getAuthor() { return author; }
+        public void setAuthor(String author) { this.author = author; }
         public String getCategory() { return category; }
         public void setCategory(String category) { this.category = category; }
         public String getPrice() { return price; }
         public void setPrice(String price) { this.price = price; }
-        public String getImageUrl() { return imageurl; } // Getter remains getImageUrl() for compatibility
-        public void setImageUrl(String imageurl) { this.imageurl = imageurl; } // Setter uses imageurl parameter
+        public String getCondition() { return condition; }
+        public void setCondition(String condition) { this.condition = condition; }
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
+        public String getImageUrl1() { return imageUrl1; }
+        public void setImageUrl1(String imageUrl1) { this.imageUrl1 = imageUrl1; }
+        public String getImageUrl2() { return imageUrl2; }
+        public void setImageUrl2(String imageUrl2) { this.imageUrl2 = imageUrl2; }
     }
 
     // RecyclerView adapter
@@ -236,10 +309,10 @@ public class MainActivity extends AppCompatActivity {
             holder.title.setText(item.getTitle());
             holder.price.setText(item.getPrice());
 
-            // Load image using Glide
-            if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+            // Load image using Glide (use imageUrl1, fallback to placeholder if null)
+            if (item.getImageUrl1() != null && !item.getImageUrl1().isEmpty()) {
                 Glide.with(context)
-                        .load(item.getImageUrl())
+                        .load(item.getImageUrl1())
                         .placeholder(R.drawable.placeholder_image)
                         .error(R.drawable.placeholder_image)
                         .into(holder.image);
@@ -248,8 +321,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.itemView.setOnClickListener(v -> {
-                // TODO: Navigate to item details activity
-                Toast.makeText(MainActivity.this, "Clicked: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                // Navigate to item details activity
+                Intent intent = new Intent(MainActivity.this, ItemDetailsActivity.class);
+                intent.putExtra("itemId", item.getId());
+                startActivity(intent);
             });
         }
 

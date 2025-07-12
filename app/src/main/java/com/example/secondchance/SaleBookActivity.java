@@ -27,9 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -211,9 +208,7 @@ public class SaleBookActivity extends AppCompatActivity {
                 !inputCategory.getText().toString().isEmpty() &&
                 !inputPrice.getText().toString().isEmpty() &&
                 !inputCondition.getText().toString().isEmpty() &&
-                !inputDescription.getText().toString().isEmpty() &&
-                imageUri1 != null &&
-                imageUri2 != null;
+                !inputDescription.getText().toString().isEmpty();
         Log.d(TAG, "Validation result: " + (isValid ? "Valid" : "Invalid"));
         return isValid;
     }
@@ -234,69 +229,7 @@ public class SaleBookActivity extends AppCompatActivity {
             String userId = currentUser.getUid();
             String productId = UUID.randomUUID().toString();
 
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("book_images/" + productId);
-            StorageReference imageRef1 = storageRef.child("image1_" + System.currentTimeMillis() + ".jpg");
-            StorageReference imageRef2 = storageRef.child("image2_" + System.currentTimeMillis() + ".jpg");
-
-            UploadTask uploadTask1 = imageRef1.putFile(imageUri1);
-            UploadTask uploadTask2 = imageRef2.putFile(imageUri2);
-
-            uploadTask1.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    imageRef1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            String imageUrl1 = uri.toString();
-                            uploadTask2.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    imageRef2.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            String imageUrl2 = uri.toString();
-                                            saveToDatabase(productId, userId, imageUrl1, imageUrl2);
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            showProgress(false);
-                                            Log.e(TAG, "Failed to get image URL 2: " + e.getMessage());
-                                            Toast.makeText(SaleBookActivity.this, "Failed to get image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    showProgress(false);
-                                    Log.e(TAG, "Failed to upload image 2: " + e.getMessage());
-                                    Toast.makeText(SaleBookActivity.this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            showProgress(false);
-                            Log.e(TAG, "Failed to get image URL 1: " + e.getMessage());
-                            Toast.makeText(SaleBookActivity.this, "Failed to get image URL: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    showProgress(false);
-                    if (e.getCause() instanceof java.net.UnknownHostException) {
-                        Log.e(TAG, "Network error: " + e.getMessage());
-                        Toast.makeText(SaleBookActivity.this, "Network error: Please check your internet connection", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.e(TAG, "Failed to upload image 1: " + e.getMessage());
-                        Toast.makeText(SaleBookActivity.this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            saveToDatabase(productId, userId);
         } else {
             showProgress(false);
             Log.e(TAG, "User not authenticated");
@@ -304,20 +237,20 @@ public class SaleBookActivity extends AppCompatActivity {
         }
     }
 
-    private void saveToDatabase(String productId, String userId, String imageUrl1, String imageUrl2) {
+    private void saveToDatabase(String productId, String userId) {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("items");
 
         Map<String, Object> bookData = new HashMap<>();
-        bookData.put("productId", productId);
+        bookData.put("id", productId); // Added id attribute
         bookData.put("userId", userId);
         bookData.put("title", inputTitle.getText().toString().trim());
         bookData.put("author", inputAuthor.getText().toString().trim());
         bookData.put("category", inputCategory.getText().toString().trim());
-        bookData.put("price", inputPrice.getText().toString().trim());
+        bookData.put("price", "₹" + inputPrice.getText().toString().trim()); // Added rupee symbol
         bookData.put("condition", inputCondition.getText().toString().trim());
         bookData.put("description", inputDescription.getText().toString().trim());
-        bookData.put("imageUrl1", imageUrl1);
-        bookData.put("imageUrl2", imageUrl2);
+        bookData.put("imageUrl1", null); // Set imageUrl1 to null
+        bookData.put("imageUrl2", null); // Set imageUrl2 to null
 
         databaseRef.child(productId).setValue(bookData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -326,7 +259,7 @@ public class SaleBookActivity extends AppCompatActivity {
                         showProgress(false);
                         Log.d(TAG, "Data saved successfully");
                         Toast.makeText(SaleBookActivity.this, "Your book has been kept on sale successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SaleBookActivity.this, ProfileActivity.class);
+                        Intent intent = new  Intent(SaleBookActivity.this, ProfileActivity.class);
                         startActivity(intent);
                         finish();
                     }
