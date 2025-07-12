@@ -2,6 +2,7 @@
   "project_info": {
     "project_number": "245013540254",
     "project_id": "secondchance-d3a91",
+    "firebase_url": "https://secondchance-d3a91-default-rtdb.firebaseio.com/",
     "storage_bucket": "secondchance-d3a91.firebasestorage.app"
   },
   "client": [
