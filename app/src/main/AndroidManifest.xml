@@ -39,5 +39,9 @@
         <activity
             android:name=".SaleBookActivity"
             android:exported="false" />
+        <activity android:name=".ListingsActivity"
+            android:exported="false"/>
+<!--        <activity android:name=".ItemDetailsActivity"-->
+<!--            android:exported="false"/>-->
     </application>
 </manifest>
