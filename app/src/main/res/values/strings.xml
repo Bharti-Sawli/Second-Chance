@@ -3,6 +3,17 @@
     <string name="logotxt">logo</string>
     <string name="emailHint">Email</string>
     <string name="name">Enter your name</string>
+    <string name="login_success">Login successful</string>
+    <string name="email_not_verified">Please verify your email address</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Invalid email format</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_length">Password must be at least 6 characters</string>
+    <string name="error_wrong_password">Incorrect password</string>
+    <string name="error_user_not_found">No account found with this email</string>
+    <string name="error_user_disabled">This account has been disabled</string>
+
 
 
 
