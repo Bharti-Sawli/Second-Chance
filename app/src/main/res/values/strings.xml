@@ -13,6 +13,16 @@
     <string name="error_wrong_password">Incorrect password</string>
     <string name="error_user_not_found">No account found with this email</string>
     <string name="error_user_disabled">This account has been disabled</string>
+    <string name="no_internet">No internet connection. Please check your network.</string>
+    <string name="welcome">Welcome, %1$s!</string>
+    <string name="welcome_generic">Welcome, User!</string>
+    <string name="enter_search_query">Please enter a search query</string>
+    <string name="no_results">No items found for "%1$s"</string>
+    <string name="no_category_items">No items found in %1$s</string>
+    <string name="failed_to_load_items">Failed to load items</string>
+    <string name="search_failed">Failed to search items</string>
+    <string name="filter_failed">Failed to filter items</string>
+
 
 
 
