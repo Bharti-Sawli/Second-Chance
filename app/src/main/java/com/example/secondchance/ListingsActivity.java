@@ -220,13 +220,13 @@ public class ListingsActivity extends AppCompatActivity {
         ItemAdapter filteredAdapter = new ItemAdapter(filteredItems, ListingsActivity.this);
         recyclerViewRecommended.setAdapter(filteredAdapter);
 
-        db.child("items").orderByChild("category").equalTo(category).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 filteredItems.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
-                    if (item != null) {
+                    if (item != null && item.getTitle() != null && item.getTitle().toLowerCase().contains(category.toLowerCase())) {
                         filteredItems.add(item);
                     }
                 }

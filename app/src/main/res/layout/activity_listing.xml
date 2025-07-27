@@ -22,7 +22,7 @@
             android:id="@+id/logo"
             android:layout_width="82dp"
             android:layout_height="50dp"
-            android:background="#F2F2F2"
+            app:tint="#FFFFFF"
             android:contentDescription="@string/logotxt"
             app:srcCompat="@drawable/logo" />
 
@@ -49,7 +49,7 @@
 
         <ImageView
             android:id="@+id/profileIcon"
-            android:layout_width="40dp"
+            android:layout_width="54dp"
             android:layout_height="60dp"
             android:background="#000000"
             android:contentDescription="User Profile"
@@ -79,7 +79,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/search_box_border"
+        android:background="@drawable/box_border"
         android:padding="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"

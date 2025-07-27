@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference db;
     private TextView txtWelcome;
     private EditText inputSearch;
-    private ImageView searchIcon;
+    private ImageView searchIcon, profileIcon;
     private Button categoryBooks, categoryElectronics, categoryClothing, categoryOthers;
     private RecyclerView recyclerViewRecommended, recyclerViewRecent;
     private BottomNavigationView bottomNavigation;
@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         txtWelcome = findViewById(R.id.txtWelcome);
         inputSearch = findViewById(R.id.inputSearch);
         searchIcon = findViewById(R.id.searchIcon);
+        profileIcon = findViewById(R.id.profileIcon); // Initialize profile icon
         categoryBooks = findViewById(R.id.categoryBooks);
         categoryElectronics = findViewById(R.id.categoryElectronics);
         categoryClothing = findViewById(R.id.categoryClothing);
@@ -92,10 +93,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set up category buttons
-        categoryBooks.setOnClickListener(v -> filterListings("Books"));
-        categoryElectronics.setOnClickListener(v -> filterListings("Electronics"));
-        categoryClothing.setOnClickListener(v -> filterListings("Clothing"));
+        categoryBooks.setOnClickListener(v -> filterListings("JEE"));
+        categoryElectronics.setOnClickListener(v -> filterListings("NEET"));
+        categoryClothing.setOnClickListener(v -> filterListings("UPSE"));
         categoryOthers.setOnClickListener(v -> filterListings("Others"));
+
+        // Set up profile icon navigation
+        profileIcon.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+            finish();
+        });
 
         // Set up RecyclerViews
         setupRecyclerViews();
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
-                // Already on home
+                recreate();
                 return true;
             } else if (itemId == R.id.nav_listings) {
                 // Navigate to ListingsActivity
@@ -176,13 +183,13 @@ public class MainActivity extends AppCompatActivity {
         ItemAdapter filteredAdapter = new ItemAdapter(filteredItems, MainActivity.this);
         recyclerViewRecommended.setAdapter(filteredAdapter);
 
-        db.child("items").orderByChild("category").equalTo(category).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("items").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 filteredItems.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
-                    if (item != null) {
+                    if (item != null && item.getCategory().toLowerCase().contains(category.toLowerCase())) {
                         filteredItems.add(item);
                     }
                 }

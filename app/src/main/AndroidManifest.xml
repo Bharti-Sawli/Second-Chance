@@ -41,7 +41,11 @@
             android:exported="false" />
         <activity android:name=".ListingsActivity"
             android:exported="false"/>
-<!--        <activity android:name=".ItemDetailsActivity"-->
-<!--            android:exported="false"/>-->
+        <activity android:name=".ItemDetailsActivity"
+            android:exported="false"/>
+        <activity android:name=".BuyNowActivity"
+            android:exported="false"/>
+        <activity android:name=".OrderPlacedActivity"
+            android:exported="false"/>
     </application>
 </manifest>
