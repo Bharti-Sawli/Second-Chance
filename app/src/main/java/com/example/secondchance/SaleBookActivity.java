@@ -40,7 +40,7 @@ public class SaleBookActivity extends AppCompatActivity {
     private static final int STORAGE_PERMISSION_CODE = 100;
 
     private EditText inputTitle, inputAuthor, inputCategory, inputPrice, inputCondition, inputDescription;
-    private ImageView imageView1, imageView2;
+    private ImageView imageView1, imageView2, backIcon;
     private Button btnChooseImage1, btnChooseImage2, btnSubmit;
     private ProgressBar progressBar;
     private Uri imageUri1, imageUri2;
@@ -55,7 +55,6 @@ public class SaleBookActivity extends AppCompatActivity {
         // Initialize Firebase
         if (FirebaseApp.getApps(this).isEmpty()) {
             FirebaseApp.initializeApp(this);
-            Log.d(TAG, "Firebase initialized");
         }
 
         // Initialize views
@@ -67,10 +66,14 @@ public class SaleBookActivity extends AppCompatActivity {
         inputDescription = findViewById(R.id.inputDescription);
         imageView1 = findViewById(R.id.imageView1);
         imageView2 = findViewById(R.id.imageView2);
+        backIcon = findViewById(R.id.backIcon); // Initialize back icon
         btnChooseImage1 = findViewById(R.id.btnChooseImage1);
         btnChooseImage2 = findViewById(R.id.btnChooseImage2);
         btnSubmit = findViewById(R.id.btnSubmit);
         progressBar = findViewById(R.id.progressBar);
+
+        // Set up back icon click listener
+        backIcon.setOnClickListener(v -> finish());
 
         // Request permission on app start
         requestStoragePermissionOnStart();
@@ -117,22 +120,17 @@ public class SaleBookActivity extends AppCompatActivity {
 
     private void requestStoragePermissionOnStart() {
         if (!checkPermission()) {
-            Log.d(TAG, "Requesting storage permission on app start");
             String[] permissions = getRequiredPermissions();
             ActivityCompat.requestPermissions(this, permissions, STORAGE_PERMISSION_CODE);
-        } else {
-            Log.d(TAG, "Storage permission already granted on app start");
         }
     }
 
     private void requestStoragePermissionWithRetry() {
         if (permissionRetryCount < MAX_RETRIES) {
-            Log.d(TAG, "Requesting storage permission (Retry #" + (permissionRetryCount + 1) + ")");
             String[] permissions = getRequiredPermissions();
             ActivityCompat.requestPermissions(this, permissions, STORAGE_PERMISSION_CODE);
             permissionRetryCount++;
         } else {
-            Log.d(TAG, "Max retries reached. Opening app settings.");
             Toast.makeText(this, "Max retries reached. Please enable storage permission in settings.", Toast.LENGTH_SHORT).show();
             openAppSettings();
         }
@@ -168,11 +166,9 @@ public class SaleBookActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Storage permission granted");
                 Toast.makeText(this, "Storage permission granted. Try selecting an image again.", Toast.LENGTH_SHORT).show();
                 permissionRetryCount = 0; // Reset retry count on success
             } else {
-                Log.d(TAG, "Storage permission denied");
                 Toast.makeText(this, "Storage permission denied. Please enable it in settings.", Toast.LENGTH_SHORT).show();
             }
         }
@@ -217,9 +213,6 @@ public class SaleBookActivity extends AppCompatActivity {
         if (progressBar != null) {
             progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
             btnSubmit.setEnabled(!show);
-        } else {
-            Log.w(TAG, "ProgressBar not found in layout");
-            btnSubmit.setEnabled(!show);
         }
     }
 
@@ -259,7 +252,7 @@ public class SaleBookActivity extends AppCompatActivity {
                         showProgress(false);
                         Log.d(TAG, "Data saved successfully");
                         Toast.makeText(SaleBookActivity.this, "Your book has been kept on sale successfully", Toast.LENGTH_SHORT).show();
-                        Intent intent = new  Intent(SaleBookActivity.this, ProfileActivity.class);
+                        Intent intent = new Intent(SaleBookActivity.this, ProfileActivity.class);
                         startActivity(intent);
                         finish();
                     }

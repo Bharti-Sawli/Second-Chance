@@ -1,244 +1,499 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FDFDFD">
+    android:background="@drawable/gradient_background">
 
     <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottomNavigation"
+        android:layout_gravity="top"
         android:fillViewport="true"
-        android:paddingBottom="60dp"
-        android:layout_gravity="top">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:paddingBottom="80dp"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#000000"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/logo"
-                android:layout_width="82dp"
-                android:layout_height="50dp"
-                android:background="#F2F2F2"
-                android:contentDescription="@string/logotxt"
-                app:srcCompat="@drawable/logo" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:background="#000000"
-                android:backgroundTint="#000000"
-                android:fontFamily="casual"
-                android:gravity="center|start"
-                android:text="SecondChance"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="#FFFFFF"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/profileIcon"
-                android:layout_width="40dp"
-                android:layout_height="60dp"
-                android:background="#000000"
-                android:contentDescription="User Profile"
-                android:padding="8dp"
-                android:src="@drawable/profile"
-                app:tint="#FFFFFF" />
-
-        </LinearLayout>
-
-        <!-- Welcome Message -->
-
-        <!-- Search Bar -->
-        <TextView
-            android:id="@+id/txtWelcome"
-            android:layout_width="382dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Welcome, User!"
-            android:textColor="#0F0F0F"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/search_box_border"
-            android:orientation="horizontal"
-            android:padding="4dp">
-
-            <EditText
-                android:id="@+id/inputSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="Search books or items..."
-                android:inputType="text"
-                android:padding="12dp"
-                android:textColor="#0F0F0F"
-                android:textColorHint="#666666" />
-
-            <!-- Vertical line separator -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:background="#000000" />
-
-            <ImageView
-                android:id="@+id/searchIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:contentDescription="Search"
-                android:padding="8dp"
-                android:src="@drawable/search" />
-        </LinearLayout>
-
-
-        <!-- Categories Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Browse Categories"
-            android:textColor="#0F0F0F"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
-
+            <!-- Enhanced Header with Gradient -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/header_gradient"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:padding="16dp"
+                android:elevation="8dp">
 
-                <Button
-                    android:id="@+id/categoryBooks"
+                <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:backgroundTint="#0F0F0F"
-                    android:text="JEE"
-                    android:textColor="#FFFFFF" />
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp"
+                    android:layout_marginEnd="12dp">
 
-                <Button
-                    android:id="@+id/categoryElectronics"
+                    <ImageView
+                        android:id="@+id/logo"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:contentDescription="@string/logotxt"
+                        android:padding="8dp"
+                        android:background="@drawable/logo_circle_bg"
+                        app:srcCompat="@drawable/logo"
+                        app:tint="#FFFFFF" />
+                </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:text="SecondChance"
+                        android:textColor="#FFFFFF"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.02" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Find Your Perfect Deal"
+                        android:textColor="#E0FFFFFF"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-light" />
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:backgroundTint="#0F0F0F"
-                    android:text="NEET"
-                    android:textColor="#FFFFFF" />
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="4dp"
+                    android:foreground="?android:attr/selectableItemBackground">
 
-                <Button
-                    android:id="@+id/categoryClothing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:backgroundTint="#0F0F0F"
-                    android:text="UPSE"
-                    android:textColor="#FFFFFF" />
+                    <ImageView
+                        android:id="@+id/profileIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:contentDescription="User Profile"
+                        android:padding="12dp"
+                        android:background="@drawable/profile_circle_bg"
+                        android:src="@drawable/profile"
+                        app:tint="#FFFFFF" />
+                </androidx.cardview.widget.CardView>
 
-                <Button
-                    android:id="@+id/categoryOthers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="#0F0F0F"
-                    android:text="Others"
-                    android:textColor="#FFFFFF" />
             </LinearLayout>
-        </HorizontalScrollView>
 
-        <!-- Recommended Items Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Recommended for You"
-            android:textColor="#0F0F0F"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            <!-- Enhanced Welcome Section with Animation -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/welcome_card_bg"
+                android:layout_margin="16dp"
+                android:padding="20dp"
+                android:elevation="6dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewRecommended"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                <TextView
+                    android:id="@+id/txtWelcome"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome Back, User! 👋"
+                    android:textColor="#1A1A1A"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="8dp" />
 
-        <!-- Recent Listings Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:text="Recent Listings"
-            android:textColor="#0F0F0F"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Discover amazing deals on educational materials"
+                    android:textColor="#666666"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-light" />
+            </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewRecent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <!-- Enhanced Search Bar with Modern Design -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="8dp"
+                android:foreground="?android:attr/selectableItemBackground">
 
-        <!-- Bottom Navigation Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/search_gradient"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    android:gravity="center_vertical">
 
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:src="@drawable/search"
+                        app:tint="#4A90E2"
+                        android:layout_marginStart="8dp" />
 
-    </LinearLayout>
+                    <EditText
+                        android:id="@+id/inputSearch"
+                        android:layout_width="0dp"
+                        android:layout_height="55dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Search books, notes, or items..."
+                        android:inputType="text"
+                        android:padding="16dp"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#999999"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif" />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="0dp"
+                        android:layout_marginEnd="8dp"
+                        android:foreground="?android:attr/selectableItemBackground">
+
+                        <ImageView
+                            android:id="@+id/searchIcon"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:contentDescription="Search"
+                            android:padding="8dp"
+                            android:background="@drawable/search_button_bg"
+                            android:src="@drawable/search"
+                            app:tint="#FFFFFF" />
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Enhanced Categories Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Browse Categories 📚"
+                        android:textColor="#1A1A1A"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View All"
+                        android:textColor="#4A90E2"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:foreground="?android:attr/selectableItemBackground" />
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="4dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="6dp"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@drawable/category_jee_bg"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🎯"
+                                    android:textSize="24sp"
+                                    android:layout_marginBottom="4dp" />
+
+                                <Button
+                                    android:id="@+id/categoryBooks"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:background="@null"
+                                    android:text="JEE"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold"
+                                    android:textSize="16sp"
+                                    android:minWidth="80dp" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="6dp"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@drawable/category_neet_bg"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🏥"
+                                    android:textSize="24sp"
+                                    android:layout_marginBottom="4dp" />
+
+                                <Button
+                                    android:id="@+id/categoryElectronics"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:background="@null"
+                                    android:text="NEET"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold"
+                                    android:textSize="16sp"
+                                    android:minWidth="80dp" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="6dp"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@drawable/category_upsc_bg"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🏛️"
+                                    android:textSize="24sp"
+                                    android:layout_marginBottom="4dp" />
+
+                                <Button
+                                    android:id="@+id/categoryClothing"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:background="@null"
+                                    android:text="UPSC"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold"
+                                    android:textSize="16sp"
+                                    android:minWidth="80dp" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:cardCornerRadius="20dp"
+                            app:cardElevation="6dp"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@drawable/category_others_bg"
+                                android:padding="16dp"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="📖"
+                                    android:textSize="24sp"
+                                    android:layout_marginBottom="4dp" />
+
+                                <Button
+                                    android:id="@+id/categoryOthers"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:background="@null"
+                                    android:text="Others"
+                                    android:textColor="#FFFFFF"
+                                    android:textStyle="bold"
+                                    android:textSize="16sp"
+                                    android:minWidth="80dp" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <!-- Enhanced Recommended Items Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Recommended for You ⭐"
+                        android:textColor="#1A1A1A"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="See All"
+                        android:textColor="#4A90E2"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:foreground="?android:attr/selectableItemBackground" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewRecommended"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- Enhanced Recent Listings Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Recent Listings 🔥"
+                        android:textColor="#1A1A1A"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View More"
+                        android:textColor="#4A90E2"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:foreground="?android:attr/selectableItemBackground" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewRecent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+        </LinearLayout>
     </ScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <!-- Enhanced Bottom Navigation -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:layout_gravity="bottom"
-        android:background="#0F0F0F"
-        app:itemIconTint="#FFFFFF"
-        app:itemTextColor="#FFFFFF"
-        app:menu="@menu/bottom_nav_menu" />
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        app:cardElevation="12dp"
+        app:cardCornerRadius="0dp">
 
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bottom_nav_gradient"
+            app:itemActiveIndicatorStyle="@style/CustomActiveIndicator"
+            app:itemIconTint="@color/bottom_nav_color_selector"
+            app:itemTextColor="@color/bottom_nav_color_selector"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu" />
+    </androidx.cardview.widget.CardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

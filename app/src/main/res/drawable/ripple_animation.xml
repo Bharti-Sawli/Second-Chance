@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base Circle -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#20FFFFFF" /> <!-- Semi-transparent white for base ripple -->
+            <size
+                android:width="120dp"
+                android:height="120dp" />
+        </shape>
+    </item>
+
+    <!-- Outer Ripple Layer -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#10FFFFFF" /> <!-- More transparent for outer effect -->
+            <size
+                android:width="140dp"
+                android:height="140dp" />
+        </shape>
+    </item>
+</layer-list>

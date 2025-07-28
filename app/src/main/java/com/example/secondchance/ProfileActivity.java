@@ -3,6 +3,7 @@ package com.example.secondchance;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -126,13 +127,21 @@ public class ProfileActivity extends AppCompatActivity {
                         String email = dataSnapshot.child("email").getValue(String.class);
                         String phone = dataSnapshot.child("phone").getValue(String.class);
                         String address = dataSnapshot.child("address").getValue(String.class);
+                        String city = dataSnapshot.child("city").getValue(String.class);
+                        String state = dataSnapshot.child("state").getValue(String.class);
+                        String pincode = dataSnapshot.child("pincode").getValue(String.class);
 
                         profileName.setText(name != null ? name : "User Name");
                         profileEmail.setText(email != null ? email : "user@example.com");
                         nameValue.setText(name != null ? name : "their name");
                         emailValue.setText(email != null ? email : "their email");
                         phoneValue.setText(phone != null ? phone : "their phone number");
-                        addressValue.setText(address != null ? address : "their address");
+                        // Combine address, city, state, and pincode for display
+                        String fullAddress = (address != null ? address : "") + ", " +
+                                (city != null ? city : "") + ", " +
+                                (state != null ? state : "") + ", " +
+                                (pincode != null ? pincode : "");
+                        addressValue.setText(fullAddress.isEmpty() ? "upload address" : fullAddress);
                     }
                 }
 
@@ -146,37 +155,95 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showEditDialog(final TextView textView, final String field) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit " + field.toUpperCase());
+        View dialogView = null;
 
-        final EditText input = new EditText(this);
-        input.setText(textView.getText().toString());
-        input.setSelection(input.getText().length()); // Move cursor to end
+        if ("address".equals(field)) {
+            builder.setTitle("Edit Address");
+            dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_address, null);
+            final EditText editAddress = dialogView.findViewById(R.id.editAddress);
+            final EditText editCity = dialogView.findViewById(R.id.editCity);
+            final EditText editState = dialogView.findViewById(R.id.editState);
+            final EditText editPinCode = dialogView.findViewById(R.id.editPinCode);
 
-        // Set input type based on field
-        if ("phone".equals(field)) {
-            input.setInputType(InputType.TYPE_CLASS_PHONE);
-        } else {
+            // Pre-fill existing values from the combined address string
+            String[] addressParts = textView.getText().toString().split(", ");
+            if (addressParts.length > 0) editAddress.setText(addressParts[0].isEmpty() ? "" : addressParts[0]);
+            if (addressParts.length > 1) editCity.setText(addressParts[1].isEmpty() ? "" : addressParts[1]);
+            if (addressParts.length > 2) editState.setText(addressParts[2].isEmpty() ? "" : addressParts[2]);
+            if (addressParts.length > 3) editPinCode.setText(addressParts[3].isEmpty() ? "" : addressParts[3].replaceAll("[^0-9]", ""));
+
+            builder.setView(dialogView);
+
+            builder.setPositiveButton("Save", (dialog, which) -> {
+                String newAddress = editAddress.getText().toString().trim();
+                String newCity = editCity.getText().toString().trim();
+                String newState = editState.getText().toString().trim();
+                String newPinCode = editPinCode.getText().toString().trim();
+
+                if (!newAddress.isEmpty() && !newCity.isEmpty() && !newState.isEmpty() && !newPinCode.isEmpty()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        String uid = user.getUid();
+                        DatabaseReference userRef = db.child(uid);
+                        userRef.child("address").setValue(newAddress);
+                        userRef.child("city").setValue(newCity);
+                        userRef.child("state").setValue(newState);
+                        userRef.child("pincode").setValue(newPinCode);
+
+                        // Update the display with the combined string
+                        String fullAddress = newAddress + ", " + newCity + ", " + newState + ", " + newPinCode;
+                        textView.setText(fullAddress);
+                        addressValue.setText(fullAddress); // Ensure consistency
+                        Toast.makeText(ProfileActivity.this, "Address updated successfully", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ProfileActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else if ("phone".equals(field)) {
+            builder.setTitle("Edit Phone Number");
+            dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_contact_number, null);
+            final EditText editPhone = dialogView.findViewById(R.id.editPhone);
+            editPhone.setText(textView.getText().toString());
+
+            builder.setView(dialogView);
+
+            builder.setPositiveButton("Save", (dialog, which) -> {
+                String newValue = editPhone.getText().toString().trim();
+                if (!newValue.isEmpty() && newValue.length() == 10 && newValue.matches("\\d+")) {
+                    updateUserData(field, newValue);
+                    textView.setText(newValue);
+                    phoneValue.setText(newValue); // Ensure consistency
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Enter a valid 10-digit phone number", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else { // Default case for "name"
+            builder.setTitle("Edit " + field.toUpperCase());
+            final EditText input = new EditText(this);
+            input.setText(textView.getText().toString());
+            input.setSelection(input.getText().length()); // Move cursor to end
             input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            builder.setPositiveButton("Save", (dialog, which) -> {
+                String newValue = input.getText().toString().trim();
+                if (!newValue.isEmpty()) {
+                    updateUserData(field, newValue);
+                    textView.setText(newValue);
+                    if ("name".equals(field)) {
+                        profileName.setText(newValue); // Update profile header name
+                        nameValue.setText(newValue);   // Ensure consistency
+                    }
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Field cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
-        builder.setView(input);
-
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            String newValue = input.getText().toString().trim();
-            if (!newValue.isEmpty()) {
-                updateUserData(field, newValue);
-                textView.setText(newValue);
-                if ("name".equals(field)) {
-                    profileName.setText(newValue); // Update profile header name
-                    nameValue.setText(newValue);   // Ensure consistency
-                }
-            } else {
-                Toast.makeText(ProfileActivity.this, "Field cannot be empty", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
         builder.show();
     }
 
@@ -193,9 +260,6 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
                 case "phone":
                     userRef.child("phone").setValue(value);
-                    break;
-                case "address":
-                    userRef.child("address").setValue(value);
                     break;
             }
 
