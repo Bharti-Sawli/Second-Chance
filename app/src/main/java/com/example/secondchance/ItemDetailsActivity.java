@@ -63,7 +63,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         txtRecommended = findViewById(R.id.txtRecommended);
         recyclerViewRecommended = findViewById(R.id.recyclerViewRecommended);
-        backIcon=findViewById(R.id.backIcon);
+        backIcon = findViewById(R.id.backIcon);
 
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -105,8 +105,8 @@ public class ItemDetailsActivity extends AppCompatActivity {
                     String condition = snapshot.child("condition").getValue(String.class);
                     String description = snapshot.child("description").getValue(String.class);
                     String userId = snapshot.child("userId").getValue(String.class);
-                    String imageUrl1 = snapshot.child("imageurl1").getValue(String.class);
-                    String imageUrl2 = snapshot.child("imageurl2").getValue(String.class);
+                    String imageUrl1 = snapshot.child("imageUrl1").getValue(String.class); // Updated field name
+                    String imageUrl2 = snapshot.child("imageUrl2").getValue(String.class); // Updated field name
 
                     itemTitle.setText(title != null ? title : "N/A");
                     itemAuthor.setText(author != null ? author : "N/A");
@@ -182,7 +182,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
         });
 
         // Back icon click
-        backIcon.setOnClickListener(v -> finish());
+        backIcon.setOnClickListener(v -> onBackPressed()); // Use onBackPressed for consistent behavior
 
         // Contact Seller button click
         btnContactSeller.setOnClickListener(v -> {
@@ -201,13 +201,13 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
     // Item class to map Firebase data
     public static class Item {
-        private String id, title, author, category, condition, description, price, userId, imageurl1, imageurl2;
+        private String id, title, author, category, condition, description, price, userId, imageUrl1, imageUrl2;
 
         public Item() {
             // Default constructor required for Firebase
         }
 
-        public Item(String id, String title, String author, String category, String condition, String description, String price, String userId, String imageurl1, String imageurl2) {
+        public Item(String id, String title, String author, String category, String condition, String description, String price, String userId, String imageUrl1, String imageUrl2) {
             this.id = id;
             this.title = title;
             this.author = author;
@@ -216,8 +216,8 @@ public class ItemDetailsActivity extends AppCompatActivity {
             this.description = description;
             this.price = price;
             this.userId = userId;
-            this.imageurl1 = imageurl1;
-            this.imageurl2 = imageurl2;
+            this.imageUrl1 = imageUrl1;
+            this.imageUrl2 = imageUrl2;
         }
 
         public String getId() { return id; }
@@ -228,8 +228,8 @@ public class ItemDetailsActivity extends AppCompatActivity {
         public String getDescription() { return description; }
         public String getPrice() { return price; }
         public String getUserId() { return userId; }
-        public String getImageurl1() { return imageurl1; }
-        public String getImageurl2() { return imageurl2; }
+        public String getImageUrl1() { return imageUrl1; } // Updated getter
+        public String getImageUrl2() { return imageUrl2; } // Updated getter
     }
 
     // Adapter for Recommended Items
@@ -259,7 +259,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
 
                 // Load image using Glide (use imageUrl1, fallback to placeholder if null)
                 Glide.with(context)
-                        .load(item.getImageurl1() != null && !item.getImageurl1().isEmpty() ? item.getImageurl1() : R.drawable.placeholder_image)
+                        .load(item.getImageUrl1() != null && !item.getImageUrl1().isEmpty() ? item.getImageUrl1() : R.drawable.placeholder_image)
                         .placeholder(R.drawable.placeholder_image)
                         .error(R.drawable.placeholder_image)
                         .into(holder.image);
@@ -323,7 +323,7 @@ public class ItemDetailsActivity extends AppCompatActivity {
         public static ImageFragment newInstance(String imageUrl) {
             ImageFragment fragment = new ImageFragment();
             Bundle args = new Bundle();
-            args.putString(ARG_IMAGE_URL, imageUrl);
+            args.putString(ARG_IMAGE_URL, imageUrl); // Pass null if imageUrl is null
             fragment.setArguments(args);
             return fragment;
         }
@@ -332,12 +332,17 @@ public class ItemDetailsActivity extends AppCompatActivity {
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_image, container, false);
             ImageView imageView = view.findViewById(R.id.imageView);
-            String imageUrl = getArguments() != null ? getArguments().getString(ARG_IMAGE_URL) : "";
+            String imageUrl = getArguments() != null ? getArguments().getString(ARG_IMAGE_URL) : null;
 
-            Glide.with(this)
-                    .load(imageUrl.isEmpty() ? R.drawable.placeholder_image : imageUrl)
-                    .placeholder(R.drawable.placeholder_image)
-                    .into(imageView);
+            // Safely handle null imageUrl
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.placeholder_image)
+                        .into(imageView);
+            } else {
+                imageView.setImageResource(R.drawable.placeholder_image); // Fallback to placeholder
+            }
 
             return view;
         }

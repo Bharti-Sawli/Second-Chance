@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         txtWelcome = findViewById(R.id.txtWelcome);
         inputSearch = findViewById(R.id.inputSearch);
         searchIcon = findViewById(R.id.searchIcon);
-        profileIcon = findViewById(R.id.profileIcon); // Initialize profile icon
+        profileIcon = findViewById(R.id.profileIcon);
         categoryBooks = findViewById(R.id.categoryBooks);
         categoryElectronics = findViewById(R.id.categoryElectronics);
         categoryClothing = findViewById(R.id.categoryClothing);
@@ -114,11 +115,9 @@ public class MainActivity extends AppCompatActivity {
                 recreate();
                 return true;
             } else if (itemId == R.id.nav_listings) {
-                // Navigate to ListingsActivity
                 startActivity(new Intent(MainActivity.this, ListingsActivity.class));
                 return true;
             } else if (itemId == R.id.nav_profile) {
-                // Navigate to ProfileActivity
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                 return true;
             }
@@ -129,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Check if user is logged in
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
@@ -137,11 +135,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerViews() {
-        // Set layout managers for horizontal scrolling
         recyclerViewRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerViewRecent.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-        // Initialize adapters with empty lists
         List<Item> recommendedItems = new ArrayList<>();
         List<Item> recentItems = new ArrayList<>();
         ItemAdapter recommendedAdapter = new ItemAdapter(recommendedItems, MainActivity.this);
@@ -149,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewRecommended.setAdapter(recommendedAdapter);
         recyclerViewRecent.setAdapter(recentAdapter);
 
-        // Fetch data from Firebase
         db.child("items").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -158,7 +153,9 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null) {
-                        // Simple logic for recommended vs recent (customize as needed)
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID
+                        }
                         if (recommendedItems.size() < 5) {
                             recommendedItems.add(item);
                         } else {
@@ -190,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null && item.getCategory().toLowerCase().contains(category.toLowerCase())) {
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID
+                        }
                         filteredItems.add(item);
                     }
                 }
@@ -219,6 +219,9 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null && item.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID
+                        }
                         searchResults.add(item);
                     }
                 }
@@ -242,7 +245,6 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    // Item class for data model
     public static class Item {
         private String id;
         private String userId;
@@ -252,14 +254,15 @@ public class MainActivity extends AppCompatActivity {
         private String price;
         private String condition;
         private String description;
-        private String imageUrl1;
-        private String imageUrl2;
+        private String imageUrl1; // Updated to match ItemDetailsActivity
+        private String imageUrl2; // Updated to match ItemDetailsActivity
 
-        // Required empty constructor for Firebase
-        public Item() {}
+        public Item() {
+            this.id = UUID.randomUUID().toString(); // Default ID if none provided
+        }
 
         public Item(String id, String userId, String title, String author, String category, String price, String condition, String description, String imageUrl1, String imageUrl2) {
-            this.id = id;
+            this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
             this.userId = userId;
             this.title = title;
             this.author = author;
@@ -294,7 +297,6 @@ public class MainActivity extends AppCompatActivity {
         public void setImageUrl2(String imageUrl2) { this.imageUrl2 = imageUrl2; }
     }
 
-    // RecyclerView adapter
     private class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
         private List<Item> items;
         private final Context context;
@@ -313,10 +315,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(ItemViewHolder holder, int position) {
             Item item = items.get(position);
-            holder.title.setText(item.getTitle());
-            holder.price.setText(item.getPrice());
+            holder.title.setText(item.getTitle() != null ? item.getTitle() : "N/A");
+            holder.price.setText(item.getPrice() != null ? item.getPrice() : "₹0");
 
-            // Load image using Glide (use imageUrl1, fallback to placeholder if null)
             if (item.getImageUrl1() != null && !item.getImageUrl1().isEmpty()) {
                 Glide.with(context)
                         .load(item.getImageUrl1())
@@ -328,16 +329,22 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.itemView.setOnClickListener(v -> {
-                // Navigate to item details activity
-                Intent intent = new Intent(MainActivity.this, ItemDetailsActivity.class);
-                intent.putExtra("itemId", item.getId());
-                startActivity(intent);
+                Item itemClicked = items.get(position);
+                Log.d("ItemAdapter", "Clicked item: " + itemClicked.getTitle() + ", ID: " + itemClicked.getId());
+                if (itemClicked.getId() != null) {
+                    Intent intent = new Intent(MainActivity.this, ItemDetailsActivity.class);
+                    intent.putExtra("itemId", itemClicked.getId());
+                    startActivity(intent);
+                } else {
+                    Log.e("ItemAdapter", "Item ID is null for: " + itemClicked.getTitle());
+                    Toast.makeText(context, "Error: Invalid item selected", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
         @Override
         public int getItemCount() {
-            return items.size();
+            return items != null ? items.size() : 0;
         }
 
         class ItemViewHolder extends RecyclerView.ViewHolder {

@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,16 +27,17 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ListingsActivity extends AppCompatActivity {
 
     private static final String TAG = "ListingsActivity";
     private FirebaseAuth mAuth;
     private DatabaseReference db;
-    private TextView txtWelcome;
     private EditText inputSearch;
     private ImageView searchIcon, profileIcon;
     private Button categoryBooks, categoryElectronics, categoryClothing, categoryOthers;
+    private TextView clearAllText; // Added for "Clear All" functionality
     private RecyclerView recyclerViewRecommended;
     private BottomNavigationView bottomNavigation;
 
@@ -72,7 +72,6 @@ public class ListingsActivity extends AppCompatActivity {
 
         // Initialize UI elements
         try {
-            txtWelcome = findViewById(R.id.txtWelcome);
             inputSearch = findViewById(R.id.inputSearch);
             searchIcon = findViewById(R.id.searchIcon);
             profileIcon = findViewById(R.id.profileIcon);
@@ -80,6 +79,7 @@ public class ListingsActivity extends AppCompatActivity {
             categoryElectronics = findViewById(R.id.categoryElectronics);
             categoryClothing = findViewById(R.id.categoryClothing);
             categoryOthers = findViewById(R.id.categoryOthers);
+            clearAllText = findViewById(R.id.clearAllText); // Initialize "Clear All" TextView
             recyclerViewRecommended = findViewById(R.id.recyclerViewRecommended);
             bottomNavigation = findViewById(R.id.bottomNavigation);
         } catch (Exception e) {
@@ -87,23 +87,6 @@ public class ListingsActivity extends AppCompatActivity {
             Toast.makeText(this, "Error initializing UI", Toast.LENGTH_LONG).show();
             finish();
             return;
-        }
-
-        // Set welcome message
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            db.child("users").child(user.getUid()).child("name").get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult().getValue() != null) {
-                    String name = task.getResult().getValue(String.class);
-                    txtWelcome.setText("Welcome, " + name + "!");
-                } else {
-                    txtWelcome.setText("Welcome, User!");
-                    Log.w(TAG, "Failed to fetch user name: " + (task.getException() != null ? task.getException().getMessage() : "No name data"));
-                }
-            });
-        } else {
-            Log.w(TAG, "No user logged in during welcome message setup");
-            txtWelcome.setText("Welcome, User!");
         }
 
         // Set up search functionality
@@ -132,6 +115,11 @@ public class ListingsActivity extends AppCompatActivity {
             }
         });
 
+        // Set up "Clear All" click to recreate activity
+        clearAllText.setOnClickListener(v -> {
+            recreate(); // Recreate the activity to reset filters
+        });
+
         // Set up RecyclerView
         setupRecyclerView();
 
@@ -147,6 +135,7 @@ public class ListingsActivity extends AppCompatActivity {
                         return true;
                     } else if (itemId == R.id.nav_listings) {
                         // Already on Listings
+                        recreate();
                         return true;
                     } else if (itemId == R.id.nav_profile) {
                         startActivity(new Intent(ListingsActivity.this, ProfileActivity.class));
@@ -198,6 +187,9 @@ public class ListingsActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null) {
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID if not set
+                        }
                         recommendedItems.add(item);
                     }
                 }
@@ -227,6 +219,9 @@ public class ListingsActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null && item.getTitle() != null && item.getTitle().toLowerCase().contains(category.toLowerCase())) {
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID if not set
+                        }
                         filteredItems.add(item);
                     }
                 }
@@ -256,6 +251,9 @@ public class ListingsActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Item item = snapshot.getValue(Item.class);
                     if (item != null && item.getTitle() != null && item.getTitle().toLowerCase().contains(query.toLowerCase())) {
+                        if (item.getId() == null || item.getId().isEmpty()) {
+                            item.setId(snapshot.getKey()); // Use Firebase key as ID if not set
+                        }
                         searchResults.add(item);
                     }
                 }
@@ -298,11 +296,13 @@ public class ListingsActivity extends AppCompatActivity {
         private String imageUrl2;
 
         // Required empty constructor for Firebase
-        public Item() {}
+        public Item() {
+            // Default constructor
+        }
 
         public Item(String id, String userId, String title, String author, String category, String price,
                     String condition, String description, String imageUrl1, String imageUrl2) {
-            this.id = id;
+            this.id = (id != null && !id.isEmpty()) ? id : UUID.randomUUID().toString();
             this.userId = userId;
             this.title = title;
             this.author = author;
@@ -372,9 +372,16 @@ public class ListingsActivity extends AppCompatActivity {
 
             holder.itemView.setOnClickListener(v -> {
                 try {
-                    Intent intent = new Intent(ListingsActivity.this, ItemDetailsActivity.class);
-                    intent.putExtra("itemId", item.getId());
-                    startActivity(intent);
+                    Item itemClicked = items.get(position);
+                    Log.d(TAG, "Clicked item: " + itemClicked.getTitle() + ", ID: " + itemClicked.getId());
+                    if (itemClicked.getId() != null && !itemClicked.getId().isEmpty()) {
+                        Intent intent = new Intent(ListingsActivity.this, ItemDetailsActivity.class);
+                        intent.putExtra("itemId", itemClicked.getId());
+                        startActivity(intent);
+                    } else {
+                        Log.e(TAG, "Item ID is null or empty for: " + itemClicked.getTitle());
+                        Toast.makeText(context, "Error: Invalid item selected", Toast.LENGTH_SHORT).show();
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to start ItemDetailsActivity: ", e);
                     Toast.makeText(ListingsActivity.this, "Error opening item details", Toast.LENGTH_SHORT).show();
@@ -384,7 +391,7 @@ public class ListingsActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return items.size();
+            return items != null ? items.size() : 0;
         }
 
         class ItemViewHolder extends RecyclerView.ViewHolder {
