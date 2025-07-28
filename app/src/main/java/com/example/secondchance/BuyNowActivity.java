@@ -443,7 +443,7 @@ public class BuyNowActivity extends AppCompatActivity {
     }
 
     // Order data class to structure the order details
-    private static class OrderData {
+    public static class OrderData {
         public String sellerUserId;
         public String buyerUserId;
         public long orderTime;
@@ -452,6 +452,8 @@ public class BuyNowActivity extends AppCompatActivity {
         public String deliveryLocation;
         public String sellerPhone;
         public String buyerPhone;
+
+        public OrderData(){}
 
         public OrderData(String sellerUserId, String buyerUserId, long orderTime, String productId, String orderId, String deliveryLocation, String sellerPhone, String buyerPhone) {
             this.sellerUserId = sellerUserId;

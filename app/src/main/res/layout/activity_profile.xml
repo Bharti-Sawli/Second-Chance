@@ -212,6 +212,7 @@
                             app:cardElevation="4dp">
 
                             <LinearLayout
+                                android:id="@+id/booksSold"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/category_neet_bg"
@@ -226,14 +227,7 @@
                                     android:textSize="20sp"
                                     android:layout_marginBottom="4dp" />
 
-                                <TextView
-                                    android:id="@+id/booksSoldCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="12"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold" />
+
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -256,6 +250,7 @@
                             app:cardElevation="4dp">
 
                             <LinearLayout
+                                android:id="@+id/booksBought"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/category_jee_bg"
@@ -270,16 +265,10 @@
                                     android:textSize="20sp"
                                     android:layout_marginBottom="4dp" />
 
-                                <TextView
-                                    android:id="@+id/booksBoughtCount"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="8"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold" />
+
 
                                 <TextView
+
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Books Bought"

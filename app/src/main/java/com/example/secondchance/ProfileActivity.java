@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView textView2; // Reference to "SecondChance" TextView
     private ImageView logo, profileIcon; // References to logo and profile icon
     private Button btnPutBookOnSale;
+    private LinearLayout booksSoldLayout, booksBoughtLayout; // Changed to LinearLayout
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class ProfileActivity extends AppCompatActivity {
         logo = findViewById(R.id.logo); // App logo
         profileIcon = findViewById(R.id.profileIcon); // Profile icon
         btnPutBookOnSale = findViewById(R.id.btnPutBookOnSale); // Put a Book on Sale button
+        booksSoldLayout = findViewById(R.id.booksSold); // Changed to LinearLayout
+        booksBoughtLayout = findViewById(R.id.booksBought); // Changed to LinearLayout
 
         // Load user data
         loadUserData();
@@ -88,6 +92,18 @@ public class ProfileActivity extends AppCompatActivity {
         // Set up "Put a Book on Sale" navigation
         btnPutBookOnSale.setOnClickListener(v -> {
             startActivity(new Intent(ProfileActivity.this, SaleBookActivity.class));
+            finish();
+        });
+
+        // Set up Books Sold navigation
+        booksSoldLayout.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, BookSoldActivity.class));
+            finish();
+        });
+
+        // Set up Books Bought navigation
+        booksBoughtLayout.setOnClickListener(v -> {
+            startActivity(new Intent(ProfileActivity.this, BookBoughtActivity.class));
             finish();
         });
 

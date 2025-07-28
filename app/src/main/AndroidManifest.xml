@@ -47,5 +47,10 @@
             android:exported="false"/>
         <activity android:name=".OrderPlacedActivity"
             android:exported="false"/>
+        <activity android:name=".BookBoughtActivity"
+            android:exported="false"/>
+        <activity android:name=".BookSoldActivity"
+            android:exported="false"/>
     </application>
+
 </manifest>

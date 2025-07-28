@@ -17,4 +17,6 @@
     <color name="rating_gold">#FFD700</color>
     <color name="bottom_nav_selected">#667eea</color>
     <color name="bottom_nav_unselected">#FFFFFFFF</color>
+    <color name="colorPrimary">#667eea</color>
+    <color name="colorPrimaryDark">#4B5EA3</color>
 </resources>
