@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.secondchance">
-
-    <!-- Permissions -->
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <!-- WRITE_EXTERNAL_STORAGE is deprecated in Android 11+ and should not be used unless absolutely necessary -->
+    <!-- Remove WRITE_EXTERNAL_STORAGE unless you need to write to shared storage -->
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
 
     <application
         android:allowBackup="true"
@@ -17,9 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Secondchance"
-        tools:targetApi="33">
-
-        <!-- Splash screen (launcher activity) -->
+        tools:targetApi="33"> <!-- Update to 33 if targeting Android 13+ -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -28,17 +30,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Authentication -->
-        <activity android:name=".LoginActivity" android:exported="false" />
-        <activity android:name=".RegisterActivity" android:exported="false" />
-
-        <!-- Core Screens -->
-        <activity android:name=".MainActivity" android:exported="false" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".SaleBookActivity" android:exported="false" />
-        <activity android:name=".ListingsActivity" android:exported="false" />
-        <activity android:name=".ItemDetailsActivity" android:exported="false" />
-
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SaleBookActivity"
+            android:exported="false" />
+        <activity android:name=".ListingsActivity"
+            android:exported="false"/>
+        <activity android:name=".ItemDetailsActivity"
+            android:exported="false"/>
+        <activity android:name=".BuyNowActivity"
+            android:exported="false"/>
+        <activity android:name=".OrderPlacedActivity"
+            android:exported="false"/>
     </application>
 </manifest>

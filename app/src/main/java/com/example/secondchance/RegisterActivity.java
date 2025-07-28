@@ -165,7 +165,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(RegisterActivity.this, "Failed to send verification email: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                                     // Still navigate to main activity
-                                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                                     startActivity(intent);
                                                     finish();
                                                 });
