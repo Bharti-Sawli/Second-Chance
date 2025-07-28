@@ -9,166 +9,160 @@ import android.text.InputType;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.secondchance.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * LoginActivity - Handles user login with Firebase authentication.
+ * Includes email verification, password toggle, error handling, and network check.
+ */
 public class LoginActivity extends AppCompatActivity {
 
-    EditText inputEmail, inputPassword;
-    Button btnLogin, btnRegister;
-    ImageView togglePassword;
-    ProgressBar progressBar; // Added for loading state
-    FirebaseAuth mAuth;
+    private ActivityLoginBinding binding;
+    private FirebaseAuth mAuth;
+    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize UI elements
-        inputEmail = findViewById(R.id.inputEmail);
-        inputPassword = findViewById(R.id.inputPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
-        togglePassword = findViewById(R.id.togglePassword);
-        progressBar = findViewById(R.id.progressBar); // Ensure this ID exists in layout
-
-        final boolean[] isPasswordVisible = {false};
-
         // Toggle password visibility
-        togglePassword.setOnClickListener(v -> {
-            if (isPasswordVisible[0]) {
-                inputPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                togglePassword.setImageResource(R.drawable.ic_eye_off);
+        binding.togglePassword.setOnClickListener(v -> {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible) {
+                binding.inputPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                binding.togglePassword.setImageResource(R.drawable.ic_eye);
             } else {
-                inputPassword.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                togglePassword.setImageResource(R.drawable.ic_eye);
+                binding.inputPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                binding.togglePassword.setImageResource(R.drawable.ic_eye_off);
             }
-            isPasswordVisible[0] = !isPasswordVisible[0];
-            inputPassword.setSelection(inputPassword.length());
+            binding.inputPassword.setSelection(binding.inputPassword.length());
         });
 
         // Login button logic
-        btnLogin.setOnClickListener(v -> {
-            String email = inputEmail.getText().toString().trim();
-            String password = inputPassword.getText().toString().trim();
+        binding.btnLogin.setOnClickListener(v -> {
+            String email = binding.inputEmail.getText().toString().trim();
+            String password = binding.inputPassword.getText().toString().trim();
 
-            // Input validation
-            if (email.isEmpty()) {
-                inputEmail.setError("Email is required");
-                inputEmail.requestFocus();
-                return;
-            }
+            if (!validateInput(email, password)) return;
 
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                inputEmail.setError("Invalid email format");
-                inputEmail.requestFocus();
-                return;
-            }
-
-            if (password.isEmpty()) {
-                inputPassword.setError("Password is required");
-                inputPassword.requestFocus();
-                return;
-            }
-
-            if (password.length() < 6) {
-                inputPassword.setError("Password must be at least 6 characters");
-                inputPassword.requestFocus();
-                return;
-            }
-
-            // Check network availability
             if (!isNetworkAvailable()) {
-                Toast.makeText(LoginActivity.this, "No internet connection. Please check your network.", Toast.LENGTH_LONG).show();
+                showToast(getString(R.string.no_internet));
                 return;
             }
 
-            // Show progress bar
-            progressBar.setVisibility(View.VISIBLE);
-            btnLogin.setEnabled(false);
+            showLoading(true);
 
-            // Firebase Authentication: Sign in user
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
-                        progressBar.setVisibility(View.GONE);
-                        btnLogin.setEnabled(true);
+                        showLoading(false);
                         if (task.isSuccessful()) {
                             FirebaseUser user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                // Check if email is verified
-                                if (user.isEmailVerified()) {
-                                    Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                    finish();
-                                } else {
-                                    // Email not verified
-                                    Toast.makeText(LoginActivity.this, "Please verify your email address", Toast.LENGTH_LONG).show();
-                                    mAuth.signOut(); // Sign out the user
-                                }
+                            if (user != null && user.isEmailVerified()) {
+                                showToast(getString(R.string.login_success));
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            } else {
+                                showToast(getString(R.string.email_not_verified));
+                                mAuth.signOut();
                             }
                         } else {
-                            // Handle specific Firebase errors
-                            String errorMessage;
-                            try {
-                                throw task.getException();
-                            } catch (FirebaseAuthException e) {
-                                switch (e.getErrorCode()) {
-                                    case "ERROR_INVALID_EMAIL":
-                                        errorMessage = "Invalid email format";
-                                        inputEmail.setError(errorMessage);
-                                        inputEmail.requestFocus();
-                                        break;
-                                    case "ERROR_WRONG_PASSWORD":
-                                        errorMessage = "Incorrect password";
-                                        inputPassword.setError(errorMessage);
-                                        inputPassword.requestFocus();
-                                        break;
-                                    case "ERROR_USER_NOT_FOUND":
-                                        errorMessage = "No account found with this email";
-                                        inputEmail.setError(errorMessage);
-                                        inputEmail.requestFocus();
-                                        break;
-                                    case "ERROR_USER_DISABLED":
-                                        errorMessage = "This account has been disabled";
-                                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                                        break;
-                                    default:
-                                        errorMessage = "Login failed: " + e.getMessage();
-                                        Log.e("LoginActivity", "FirebaseAuthError: " + e.getErrorCode() + " - " + e.getMessage());
-                                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                                }
-                            } catch (Exception e) {
-                                errorMessage = "Login failed: " + e.getMessage();
-                                Log.e("LoginActivity", "Error: ", e);
-                                Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                            }
+                            handleFirebaseError(task.getException());
                         }
                     });
         });
 
         // Register button logic
-        btnRegister.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-        });
+        binding.btnRegister.setOnClickListener(v ->
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
     }
 
-    // Check network availability
+    private boolean validateInput(String email, String password) {
+        if (email.isEmpty()) {
+            binding.inputEmail.setError(getString(R.string.error_email_required));
+            binding.inputEmail.requestFocus();
+            return false;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.inputEmail.setError(getString(R.string.error_email_invalid));
+            binding.inputEmail.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            binding.inputPassword.setError(getString(R.string.error_password_required));
+            binding.inputPassword.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            binding.inputPassword.setError(getString(R.string.error_password_length));
+            binding.inputPassword.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void handleFirebaseError(Exception exception) {
+        String errorMessage;
+        try {
+            throw exception;
+        } catch (FirebaseAuthException e) {
+            switch (e.getErrorCode()) {
+                case "ERROR_INVALID_EMAIL":
+                    errorMessage = getString(R.string.error_email_invalid);
+                    binding.inputEmail.setError(errorMessage);
+                    binding.inputEmail.requestFocus();
+                    break;
+                case "ERROR_WRONG_PASSWORD":
+                    errorMessage = getString(R.string.error_wrong_password);
+                    binding.inputPassword.setError(errorMessage);
+                    binding.inputPassword.requestFocus();
+                    break;
+                case "ERROR_USER_NOT_FOUND":
+                    errorMessage = getString(R.string.error_user_not_found);
+                    binding.inputEmail.setError(errorMessage);
+                    binding.inputEmail.requestFocus();
+                    break;
+                case "ERROR_USER_DISABLED":
+                    errorMessage = getString(R.string.error_user_disabled);
+                    break;
+                default:
+                    errorMessage = "Login failed: " + e.getMessage();
+                    Log.e("LoginActivity", "FirebaseAuthError: " + e.getErrorCode(), e);
+            }
+            showToast(errorMessage);
+        } catch (Exception e) {
+            errorMessage = "Login failed: " + e.getMessage();
+            Log.e("LoginActivity", "Unknown error: ", e);
+            showToast(errorMessage);
+        }
+    }
+
+    private void showLoading(boolean isLoading) {
+        binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        binding.btnLogin.setEnabled(!isLoading);
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+    }
+
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
     }
 }
