@@ -1,14 +1,11 @@
 package com.example.secondchance;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,31 +17,32 @@ public class OrderPlacedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_order_placed);
 
         // Initialize views
-        VideoView videoView = findViewById(R.id.videoView);
+        ImageView successIcon = findViewById(R.id.successIcon); // Replaced VideoView with ImageView
         TextView orderMessage = findViewById(R.id.orderMessage);
+        TextView orderId = findViewById(R.id.orderId);
+        TextView deliveryDate = findViewById(R.id.deliveryDate);
+        TextView paymentMethod = findViewById(R.id.paymentMethod);
         Button backButton = findViewById(R.id.backButton);
-        ImageView backIcon = findViewById(R.id.backIcon); // Initialize back icon
+        ImageView backIcon = findViewById(R.id.backIcon);
 
-        // Set up the video
-        videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.order_placed));
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true); // Optional: Loop the video
-                videoView.start();
-            }
-        });
+        // Get data from intent
+        String itemId = getIntent().getStringExtra("itemId");
+        String paymentMethodText = getIntent().getStringExtra("paymentMethod");
+        String phone = getIntent().getStringExtra("phone");
 
         // Set order message with payment method and phone number if available
-        String paymentMethod = getIntent().getStringExtra("paymentMethod");
-        String phone = getIntent().getStringExtra("phone");
-        if (paymentMethod != null && phone != null) {
-            orderMessage.setText("Order Successfully Placed\nwith " + paymentMethod + "!");
-        } else if (paymentMethod != null) {
-            orderMessage.setText("Order Successfully Placed with " + paymentMethod + "!");
+        if (paymentMethodText != null && phone != null) {
+            orderMessage.setText("🎉 Order Successfully Placed!\nwith " + paymentMethodText + "!");
+        } else if (paymentMethodText != null) {
+            orderMessage.setText("🎉 Order Successfully Placed with " + paymentMethodText + "!");
         } else {
-            orderMessage.setText("Order Successfully Placed!");
+            orderMessage.setText("🎉 Order Successfully Placed!");
         }
+
+        // Set order details
+        orderId.setText(getIntent().getStringExtra("orderId")); // Generate a unique order ID based on timestamp
+        deliveryDate.setText("3-5 Business Days"); // Static value as per layout
+        paymentMethod.setText(paymentMethodText != null ? paymentMethodText : "Cash on Delivery"); // Default to COD if not provided
 
         // Back icon click listener
         backIcon.setOnClickListener(v -> {
@@ -55,32 +53,11 @@ public class OrderPlacedActivity extends AppCompatActivity {
         });
 
         // Back button click listener
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(OrderPlacedActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-            }
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(OrderPlacedActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
         });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        VideoView videoView = findViewById(R.id.videoView);
-        if (videoView != null && videoView.isPlaying()) {
-            videoView.pause();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        VideoView videoView = findViewById(R.id.videoView);
-        if (videoView != null && !videoView.isPlaying()) {
-            videoView.start();
-        }
     }
 }
