@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,10 +31,11 @@ import java.util.UUID;
 
 public class BuyNowActivity extends AppCompatActivity {
 
-    private TextView itemTitle, itemPrice, sellerName, deliveryInfo, deliveryLocation, contactNumber;
+    private TextView itemTitle, itemPrice, sellerName, deliveryInfo, deliveryLocation, contactNumber,
+            itemTotal, deliveryCharges, totalAmount, bottomTotalAmount, changeAddress, changeContactNumber;
     private ImageView itemImage, backIcon;
-    private Button btnProceedToPay, changeAddress, changeContactNumber;
-    private CheckBox cashOnDelivery, creditCard, debitCard, upi;
+    private Button btnProceedToPay;
+    private RadioButton cashOnDelivery, upi, creditCard; // Changed from CheckBox to RadioButton
     private DatabaseReference itemsRef, usersRef, ordersRef, orderedProductsRef;
     private String itemId;
     private FirebaseUser currentUser;
@@ -52,32 +53,33 @@ public class BuyNowActivity extends AppCompatActivity {
         deliveryLocation = findViewById(R.id.deliveryLocation);
         contactNumber = findViewById(R.id.contactNumber);
         itemImage = findViewById(R.id.itemImage);
-        backIcon = findViewById(R.id.backIcon); // Initialize back icon
+        backIcon = findViewById(R.id.backIcon);
         btnProceedToPay = findViewById(R.id.btnProceedToPay);
-        changeAddress = findViewById(R.id.changeAddress);
-        changeContactNumber = findViewById(R.id.changeContactNumber);
-        cashOnDelivery = findViewById(R.id.cashOnDelivery);
-        creditCard = findViewById(R.id.creditCard);
-        debitCard = findViewById(R.id.debitCard);
-        upi = findViewById(R.id.upi);
+        changeAddress = findViewById(R.id.changeAddress); // Changed from Button to TextView
+        changeContactNumber = findViewById(R.id.changeContactNumber); // Changed from Button to TextView
+        cashOnDelivery = findViewById(R.id.cashOnDelivery); // Changed from CheckBox to RadioButton
+        upi = findViewById(R.id.upi); // Changed from CheckBox to RadioButton
+        creditCard = findViewById(R.id.creditCard); // Changed from CheckBox to RadioButton
+        itemTotal = findViewById(R.id.itemTotal);
+        deliveryCharges = findViewById(R.id.deliveryCharges);
+        totalAmount = findViewById(R.id.totalAmount);
+        bottomTotalAmount = findViewById(R.id.bottomTotalAmount);
 
-        // Ensure only one payment method can be selected at a time
+        // Ensure only one payment method can be selected at a time (using RadioButton behavior)
         View.OnClickListener paymentListener = v -> {
-            if (v instanceof CheckBox) {
-                CheckBox clicked = (CheckBox) v;
+            if (v instanceof RadioButton) {
+                RadioButton clicked = (RadioButton) v;
                 if (clicked.isChecked()) {
                     cashOnDelivery.setChecked(clicked == cashOnDelivery);
-                    creditCard.setChecked(clicked == creditCard);
-                    debitCard.setChecked(clicked == debitCard);
                     upi.setChecked(clicked == upi);
+                    creditCard.setChecked(clicked == creditCard);
                     updateProceedButtonText();
                 }
             }
         };
         cashOnDelivery.setOnClickListener(paymentListener);
-        creditCard.setOnClickListener(paymentListener);
-        debitCard.setOnClickListener(paymentListener);
         upi.setOnClickListener(paymentListener);
+        creditCard.setOnClickListener(paymentListener);
 
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -89,6 +91,8 @@ public class BuyNowActivity extends AppCompatActivity {
 
         // Set up back icon click listener
         backIcon.setOnClickListener(v -> onBackPressed());
+
+
 
         // Get itemId from intent
         itemId = getIntent().getStringExtra("itemId");
@@ -106,11 +110,15 @@ public class BuyNowActivity extends AppCompatActivity {
                     String title = snapshot.child("title").getValue(String.class);
                     String price = snapshot.child("price").getValue(String.class);
                     String sellerUserId = snapshot.child("userId").getValue(String.class);
-                    String imageUrl1 = snapshot.child("imageurl1").getValue(String.class);
+                    String imageUrl1 = snapshot.child("imageUrl1").getValue(String.class);
 
                     itemTitle.setText(title != null ? title : "N/A");
                     itemPrice.setText(price != null ? "₹" + price : "₹0");
-                    deliveryInfo.setText("Estimated delivery: 3-5 business days");
+                    itemTotal.setText(price != null ? "₹" + price : "₹0");
+                    deliveryCharges.setText("FREE");
+                    totalAmount.setText(price != null ? "₹" + price : "₹0");
+                    bottomTotalAmount.setText(price != null ? "₹" + price : "₹0");
+                    deliveryInfo.setText("Expected delivery: 3-5 business days");
 
                     Glide.with(BuyNowActivity.this)
                             .load(imageUrl1 != null ? imageUrl1 : R.drawable.placeholder_image)
@@ -125,21 +133,20 @@ public class BuyNowActivity extends AppCompatActivity {
                                 if (userSnapshot.exists()) {
                                     String name = userSnapshot.child("name").getValue(String.class);
                                     String sellerPhone = userSnapshot.child("phone").getValue(String.class);
-                                    sellerName.setText(name != null ? "Seller: " + name : "Seller: Unknown");
-                                    // Store seller phone for order (if available)
+                                    sellerName.setText(name != null ? "Sold by: " + name : "Sold by: Unknown");
                                 } else {
-                                    sellerName.setText("Seller: Unknown");
+                                    sellerName.setText("Sold by: Unknown");
                                 }
                             }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
-                                sellerName.setText("Seller: Unknown");
+                                sellerName.setText("Sold by: Unknown");
                                 Log.e("BuyNowActivity", "Failed to fetch seller: ", error.toException());
                             }
                         });
                     } else {
-                        sellerName.setText("Seller: Unknown");
+                        sellerName.setText("Sold by: Unknown");
                     }
                 } else {
                     Toast.makeText(BuyNowActivity.this, "Item not found", Toast.LENGTH_SHORT).show();
@@ -189,10 +196,10 @@ public class BuyNowActivity extends AppCompatActivity {
             contactNumber.setText("[Not set]");
         }
 
-        // Change Address button click
+        // Change Address button click (now TextView)
         changeAddress.setOnClickListener(v -> showAddressChangeDialog());
 
-        // Change Contact Number button click
+        // Change Contact Number button click (now TextView)
         changeContactNumber.setOnClickListener(v -> showContactNumberDialog());
 
         // Proceed to Pay button click
@@ -204,7 +211,6 @@ public class BuyNowActivity extends AppCompatActivity {
             } else if (phone.equals("[Not set]")) {
                 showContactNumberDialog();
             } else if (selectedPayment.equals("Cash on Delivery")) {
-                // Fetch seller details for order
                 itemsRef.child(itemId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -220,11 +226,9 @@ public class BuyNowActivity extends AppCompatActivity {
                                             String buyerPhone = contactNumber.getText().toString().trim();
                                             String deliveryLoc = deliveryLocation.getText().toString().trim();
 
-                                            // Generate unique order ID
                                             String orderId = UUID.randomUUID().toString();
                                             long orderTime = System.currentTimeMillis();
 
-                                            // Create order data
                                             OrderData orderData = new OrderData(
                                                     sellerUserId,
                                                     buyerUserId,
@@ -236,10 +240,8 @@ public class BuyNowActivity extends AppCompatActivity {
                                                     buyerPhone
                                             );
 
-                                            // Store order in Firebase
                                             ordersRef.child(orderId).setValue(orderData)
                                                     .addOnSuccessListener(aVoid -> {
-                                                        // Copy product data to orderedProducts
                                                         Map<String, Object> productData = new HashMap<>();
                                                         productData.put("author", snapshot.child("author").getValue(String.class));
                                                         productData.put("category", snapshot.child("category").getValue(String.class));
@@ -249,12 +251,11 @@ public class BuyNowActivity extends AppCompatActivity {
                                                         productData.put("price", snapshot.child("price").getValue(String.class));
                                                         productData.put("title", snapshot.child("title").getValue(String.class));
                                                         productData.put("userId", snapshot.child("userId").getValue(String.class));
-                                                        productData.put("imageurl1", snapshot.child("imageurl1").getValue(String.class));
-                                                        productData.put("imageurl2", snapshot.child("imageurl2").getValue(String.class));
+                                                        productData.put("imageUrl1", snapshot.child("imageUrl1").getValue(String.class));
+                                                        productData.put("imageUrl2", snapshot.child("imageUrl2").getValue(String.class));
 
                                                         orderedProductsRef.child(itemId).setValue(productData)
                                                                 .addOnSuccessListener(aVoid2 -> {
-                                                                    // Delete product from items after successful copy
                                                                     itemsRef.child(itemId).removeValue()
                                                                             .addOnSuccessListener(aVoid3 -> {
                                                                                 Toast.makeText(BuyNowActivity.this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
@@ -315,9 +316,8 @@ public class BuyNowActivity extends AppCompatActivity {
 
     private String getSelectedPaymentMethod() {
         if (cashOnDelivery.isChecked()) return "Cash on Delivery";
-        if (creditCard.isChecked()) return "Credit Card";
-        if (debitCard.isChecked()) return "Debit Card";
         if (upi.isChecked()) return "UPI";
+        if (creditCard.isChecked()) return "Credit/Debit Card";
         return null;
     }
 
@@ -336,7 +336,6 @@ public class BuyNowActivity extends AppCompatActivity {
         EditText editState = dialogView.findViewById(R.id.editState);
         EditText editAddress = dialogView.findViewById(R.id.editAddress);
 
-        // Pre-fill current address if available
         usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -402,7 +401,6 @@ public class BuyNowActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         EditText editPhone = dialogView.findViewById(R.id.editPhone);
-        // Pre-fill current phone number if available
         usersRef.child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
