@@ -261,6 +261,7 @@ public class BuyNowActivity extends AppCompatActivity {
                                                                                 Toast.makeText(BuyNowActivity.this, "Order placed successfully!", Toast.LENGTH_SHORT).show();
                                                                                 Intent intent = new Intent(BuyNowActivity.this, OrderPlacedActivity.class);
                                                                                 intent.putExtra("itemId", itemId);
+                                                                                intent.putExtra("orderId",orderId);
                                                                                 intent.putExtra("paymentMethod", selectedPayment);
                                                                                 intent.putExtra("phone", buyerPhone);
                                                                                 startActivity(intent);

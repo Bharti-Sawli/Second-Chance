@@ -13,7 +13,7 @@
     <string name="error_wrong_password">Incorrect password</string>
     <string name="error_user_not_found">No account found with this email</string>
     <string name="error_user_disabled">This account has been disabled</string>
-    <string name="no_internet">No internet connection. Please check your network.</string>
+
     <string name="welcome">Welcome, %1$s!</string>
     <string name="welcome_generic">Welcome, User!</string>
     <string name="enter_search_query">Please enter a search query</string>
